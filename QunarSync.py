@@ -9,7 +9,7 @@ class QunarSync():
     local_path = None
     remote_path = ''
     sync_type = 'all'
-    version = '0.1.0'
+    version = '0.1.1'
 
     def run(self, command_object, edit, sync_type):
         self.view = command_object.view
