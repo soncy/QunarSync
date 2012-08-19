@@ -7,14 +7,12 @@ import sublime, sublime_plugin
 class QunarSync():
     item_list = []
     local_path = None
-    remote_path = ''
+    remote_path = '/'
     sync_type = 'all'
-    version = '0.1.1'
 
-    def run(self, command_object, edit, sync_type):
+    def run(self, command_object, edit, sync_type, file = None):
         self.view = command_object.view
-        config_file = self.find_config()['file_path']
-
+        config_file = self.find_config(file)['file_path']
         if (config_file is False) :
             return
         if (config_file is None) :
@@ -22,19 +20,19 @@ class QunarSync():
             return
 
         if (sync_type is 'file'):
-            self.remote_path = self.find_remote_path()
+            self.remote_path = self.find_remote_path(file)
             self.sync_type = 'file'
 
         self.start(config_file)
 
-    def find_remote_path(self):
-        filePath = self.view.file_name()
-        config_file = self.find_config()['folder_path']
+    def find_remote_path(self, file):
+        filePath = file or self.view.file_name()
+        config_file = self.find_config(file)['folder_path']
         return filePath.replace(config_file, '')
 
 
-    def find_config(self):
-        filePath = self.view.file_name()
+    def find_config(self, file):
+        filePath = file or self.view.file_name()
         ret = {'file_path': None}
 
         if (filePath is None) :
@@ -48,7 +46,7 @@ class QunarSync():
             config_path = folder + '/qsync-conf.json'
             if (os.path.exists(config_path) is True):
                 ret = {'folder_path':folder, 'file_path':config_path}
-                self.local_path = folder + '/'
+                self.local_path = folder + ''
                 return ret
         return ret
 
@@ -153,6 +151,12 @@ class QunarSyncCommand(sublime_plugin.TextCommand):
         qunarSync.run(self, edit, 'all')
 
 class QunarSyncThisFileCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
+    def run(self, edit, paths = []):
         qunarSync = QunarSync()
-        qunarSync.run(self, edit, 'file')
+        paths_len = len(paths)
+
+        if (paths_len > 0):
+            for item in paths:
+                qunarSync.run(self, edit, 'file', item)
+        else:        
+            qunarSync.run(self, edit, 'file')
