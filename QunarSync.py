@@ -1,8 +1,12 @@
 #  -*- coding:utf-8 -*-
 import os
-import subprocess
 import json
 import sublime, sublime_plugin
+
+try:
+    import commands
+except Exception as e:
+    import subprocess
 
 class QunarSync():
     item_list = []
@@ -135,7 +139,10 @@ class QunarSync():
 
         sync_command = 'rsync -rzcv %s --timeout=10 --chmod="a=rX,u+w" --rsync-path="sudo rsync" %s %s %s %s%s:%s ' %(isdel, include, exclude, local_path, user, host, path)
         print(sync_command)
-        status, output = subprocess.getstatusoutput(sync_command)
+        try:
+            status, output = commands.getstatusoutput(sync_command)
+        except Exception as e:
+            status, output = subprocess.getstatusoutput(sync_command)
         print(output)
         return
 
