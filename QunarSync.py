@@ -1,6 +1,6 @@
 #  -*- coding:utf-8 -*-
 import os
-import commands
+import subprocess
 import json
 import sublime, sublime_plugin
 
@@ -51,10 +51,10 @@ class QunarSync():
         return ret
 
     def start(self, config_file):
-        fp = file(config_file, 'r')
+        fp = open(config_file, 'r')
         try:
             data = json.load(fp)
-        except Exception, e:
+        except Exception as e:
             sublime.error_message('qsync-conf.json is no a json file')
             return
         self.analysis_conf(data)
@@ -67,7 +67,7 @@ class QunarSync():
             try:
                 host = item["host"]
                 path = item["path"]
-            except Exception, e:
+            except Exception as e:
                 sublime.error_message('qsync-conf.json can\'t be format,there is no host or path')
                 return
             keys.append(k)
@@ -135,14 +135,14 @@ class QunarSync():
 
         sync_command = 'rsync -rzcv %s --timeout=10 --chmod="a=rX,u+w" --rsync-path="sudo rsync" %s %s %s %s%s:%s ' %(isdel, include, exclude, local_path, user, host, path)
         print(sync_command)
-        status, output = commands.getstatusoutput(sync_command)
+        status, output = subprocess.getstatusoutput(sync_command)
         print(output)
         return
 
     def get(self, data, key):
         try:
             return data[key]
-        except Exception, e:
+        except Exception as e:
             return None
 
 class QunarSyncCommand(sublime_plugin.TextCommand):
