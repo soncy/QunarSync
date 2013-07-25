@@ -42,16 +42,16 @@ class QunarSync():
         if (filePath is None) :
             sublime.error_message('no file be opend')
             return False
-            
-        folders = filePath.split('/')
-        while len(folders) > 0:
-            folders.pop()
-            folder = ('/').join(folders)
-            config_path = folder + '/qsync-conf.json'
+
+        nowPath = os.path.split(filePath)[0]
+        while os.path.split(nowPath)[1] is not '':
+            config_path = os.path.join(nowPath, 'qsync-conf.json')
             if (os.path.exists(config_path) is True):
-                ret = {'folder_path':folder, 'file_path':config_path}
-                self.local_path = folder + ''
+                ret = {'folder_path':nowPath, 'file_path':config_path}
+                self.local_path = nowPath + ''
                 return ret
+            else:
+                nowPath = (os.path.split(nowPath))[0]
         return ret
 
     def start(self, config_file):
